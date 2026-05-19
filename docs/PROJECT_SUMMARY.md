@@ -9,7 +9,10 @@
 - `device_config.json`：设备编号、摄像头、阈值、MQTT/HTTP 地址和本地路径配置。
 
 ## models
-- `README.md`：模型文件说明。
+- `README.md`：OpenCV Haar 和 dlib 68 点模型文件说明。
+
+## scripts
+- `download_models.ps1`：下载 OpenCV Haar 与 dlib 68 点模型到 `models` 目录。
 
 ## src/domain
 - `Person.h`：人员资料结构和 JSON 序列化。
@@ -27,7 +30,7 @@
 - `FaceTypes.h`：识别状态、检测结果、识别结果定义。
 - `FaceFeatureExtractor.h/cpp`：人脸特征提取与相似度计算。
 - `LivenessDetector.h/cpp`：EAR 眨眼活体检测。
-- `FaceRecognizer.h/cpp`：人脸检测、识别、人员录入。
+- `FaceRecognizer.h/cpp`：加载 OpenCV Haar 人脸检测模型、dlib 68 点关键点模型，完成人脸检测、识别、人员录入。
 
 ## src/storage
 - `DatabaseManager.h/cpp`：SQLite 数据库连接、人员库、识别人脸记录、考勤记录、日志管理。
@@ -53,7 +56,8 @@
 ## 运行特点
 - 有 OpenCV、dlib、Qt MQTT 时使用增强路径。
 - 未配置 OpenCV 时，若 Qt 安装包含 Multimedia 模块，也可以直接调用电脑自带摄像头。
-- 缺少依赖时会自动降级到演示逻辑，保证主流程仍可打开。
+- 摄像头或通信依赖缺失时仍会降级，保证界面、数据库等主流程可打开。
+- 人脸检测和 68 点关键点流程要求 `models/haarcascade_frontalface_default.xml` 与 `models/shape_predictor_68_face_landmarks.dat` 存在并成功加载。
 - 本地数据库固定创建在项目目录 `data/smartsite.sqlite`，可用 Navicat Premium 17 以 SQLite 文件方式打开。
 - 右侧“人员录入”区域可把当前摄像头画面录入到 `persons` 表，后续识别会直接匹配新人员。
 - `recognized_faces` 表保存每次识别结果和抓拍图片路径，抓拍文件保存在 `data/captures`。

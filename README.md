@@ -16,7 +16,7 @@ qmake SmartSiteFaceAttendance.pro
 nmake
 ```
 
-如果要启用 OpenCV 或 dlib，可在 qmake 时传入 `OPENCV_INCLUDEPATH`、`OPENCV_LIBS`、`DLIB_INCLUDEPATH`、`DLIB_LIBS`。
+要真实使用 Haar 检测和 dlib 68 点关键点，需要在 qmake 时传入 `OPENCV_INCLUDEPATH`、`OPENCV_LIBS`、`DLIB_INCLUDEPATH`、`DLIB_LIBS`，并把模型文件放到 `models` 目录。
 
 如果本机缺少 OpenCV、dlib 或 Qt MQTT，项目会自动使用降级实现。摄像头会优先使用 OpenCV；未启用 OpenCV 时，会自动尝试 Qt Multimedia 调用电脑摄像头；两者都不可用时才会显示演示画面。MQTT 会退化为 HTTP/本地缓存，核心业务流程仍可运行。
 
@@ -38,5 +38,20 @@ nmake
 在 Qt Creator 中运行后，先点击“启动”，等左侧摄像头画面出现。右侧“人员录入”区域填写姓名、班组、角色、证件号等信息，点击“录入当前人脸”，程序会从当前画面提取人脸特征并保存到 `persons` 表。之后识别流程会自动使用这个人员库进行匹配，识别明细会继续写入 `recognized_faces` 表。
 
 如果日志显示“使用演示画面”，请在 Qt 安装维护工具中确认已安装 Qt Multimedia 模块，并检查 Windows 设置里的摄像头权限。如果日志显示“图像质量不足”，请让人脸尽量位于画面中央，并保证光线充足。
+
+## 真实模型文件
+
+当前识别流程要求真实使用 OpenCV Haar 和 dlib 68 点模型。请把以下两个文件放到 `D:\MyGitWarehouse\git\models`：
+
+- `haarcascade_frontalface_default.xml`
+- `shape_predictor_68_face_landmarks.dat`
+
+可以运行脚本下载模型：
+
+```powershell
+powershell -ExecutionPolicy Bypass -File scripts\download_models.ps1
+```
+
+程序启动时会按 `config/device_config.json` 中的 `models.faceCascade` 和 `models.shapePredictor68` 加载模型。缺少 Haar 模型时无法检测人脸；缺少 dlib 68 点模型时无法完成 68 点关键点和活体流程。
 
 完整目录说明见 [docs/PROJECT_SUMMARY.md](docs/PROJECT_SUMMARY.md)。
