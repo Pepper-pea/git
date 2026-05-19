@@ -7,6 +7,7 @@ set(CMAKE_AUTORCC ON) # 自动处理 Qt 资源文件。
 set(CMAKE_AUTOUIC OFF) # 本项目使用纯代码界面，不启用 ui 文件自动处理。
 find_package(Qt6 REQUIRED COMPONENTS Core Widgets Sql Network) # 查找 Qt6 核心、界面、数据库和网络模块。
 find_package(Qt6 COMPONENTS Mqtt QUIET) # 可选查找 Qt MQTT 模块。
+find_package(Qt6 COMPONENTS Multimedia QUIET) # 可选查找 Qt Multimedia 摄像头模块。
 find_package(OpenCV QUIET) # 可选查找 OpenCV 图像处理库。
 find_package(dlib CONFIG QUIET) # 可选查找 dlib 人脸检测与关键点库。
 set(SMART_SITE_SOURCES # 声明项目源码列表。
@@ -30,6 +31,10 @@ if(Qt6Mqtt_FOUND) # 判断当前环境是否提供 Qt MQTT 模块。
     target_compile_definitions(SmartSiteFaceAttendance PRIVATE SMARTSITE_HAS_MQTT) # 启用 MQTT 编译开关。
     target_link_libraries(SmartSiteFaceAttendance PRIVATE Qt6::Mqtt) # 链接 Qt MQTT 模块。
 endif() # 结束 MQTT 判断。
+if(Qt6Multimedia_FOUND) # 判断当前环境是否提供 Qt Multimedia 模块。
+    target_compile_definitions(SmartSiteFaceAttendance PRIVATE SMARTSITE_HAS_QTMULTIMEDIA) # 启用 Qt Multimedia 摄像头采集。
+    target_link_libraries(SmartSiteFaceAttendance PRIVATE Qt6::Multimedia) # 链接 Qt Multimedia 模块。
+endif() # 结束 Qt Multimedia 判断。
 if(OpenCV_FOUND) # 判断当前环境是否提供 OpenCV。
     target_compile_definitions(SmartSiteFaceAttendance PRIVATE SMARTSITE_HAS_OPENCV) # 启用 OpenCV 编译开关。
     target_include_directories(SmartSiteFaceAttendance PRIVATE ${OpenCV_INCLUDE_DIRS}) # 加入 OpenCV 头文件目录。

@@ -18,7 +18,7 @@
 
 ## src/camera
 - `FramePacket.h`：视频帧数据结构。
-- `CameraWorker.h/cpp`：摄像头采集线程，支持真实摄像头和演示画面降级。
+- `CameraWorker.h/cpp`：摄像头采集线程，优先使用 OpenCV，未启用 OpenCV 时使用 Qt Multimedia，最后降级到演示画面。
 
 ## src/utils
 - `MatImageConverter.h/cpp`：OpenCV Mat 与 Qt QImage 转换工具。
@@ -52,6 +52,7 @@
 
 ## 运行特点
 - 有 OpenCV、dlib、Qt MQTT 时使用增强路径。
+- 未配置 OpenCV 时，若 Qt 安装包含 Multimedia 模块，也可以直接调用电脑自带摄像头。
 - 缺少依赖时会自动降级到演示逻辑，保证主流程仍可打开。
 - 本地数据库固定创建在项目目录 `data/smartsite.sqlite`，可用 Navicat Premium 17 以 SQLite 文件方式打开。
 - 右侧“人员录入”区域可把当前摄像头画面录入到 `persons` 表，后续识别会直接匹配新人员。

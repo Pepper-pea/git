@@ -7,6 +7,14 @@ qtHaveModule(mqtt) {
     DEFINES += SMARTSITE_HAS_MQTT
 }
 
+# 如果当前 Qt 6 安装包含 Multimedia 模块，就用 Qt 自带摄像头接口作为 OpenCV 之外的采集方案。
+greaterThan(QT_MAJOR_VERSION, 5) {
+    qtHaveModule(multimedia) {
+        QT += multimedia
+        DEFINES += SMARTSITE_HAS_QTMULTIMEDIA
+    }
+}
+
 # 使用 C++17，并打开常规警告。
 CONFIG += c++17
 CONFIG += warn_on
