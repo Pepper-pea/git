@@ -45,7 +45,7 @@
 - `SystemMonitor.h/cpp`：心跳、健康检查、看门狗触发和系统监控。
 
 ## src/ui
-- `MainWindow.h/cpp`：主界面，负责视频、日志、人员库、考勤记录和状态显示。
+- `MainWindow.h/cpp`：主界面，负责视频、人员录入、日志、人员库、考勤记录和状态显示。
 
 ## src
 - `main.cpp`：Qt 应用入口。
@@ -54,4 +54,5 @@
 - 有 OpenCV、dlib、Qt MQTT 时使用增强路径。
 - 缺少依赖时会自动降级到演示逻辑，保证主流程仍可打开。
 - 本地数据库固定创建在项目目录 `data/smartsite.sqlite`，可用 Navicat Premium 17 以 SQLite 文件方式打开。
+- 右侧“人员录入”区域可把当前摄像头画面录入到 `persons` 表，后续识别会直接匹配新人员。
 - `recognized_faces` 表保存每次识别结果和抓拍图片路径，抓拍文件保存在 `data/captures`。

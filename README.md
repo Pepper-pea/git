@@ -33,4 +33,8 @@ nmake
 
 数据库表结构脚本见 [docs/sqlite_schema.sql](docs/sqlite_schema.sql)。
 
+## 人脸录入和识别
+
+在 Qt Creator 中运行后，先点击“启动”，等左侧摄像头画面出现。右侧“人员录入”区域填写姓名、班组、角色、证件号等信息，点击“录入当前人脸”，程序会从当前画面提取人脸特征并保存到 `persons` 表。之后识别流程会自动使用这个人员库进行匹配，识别明细会继续写入 `recognized_faces` 表。
+
 完整目录说明见 [docs/PROJECT_SUMMARY.md](docs/PROJECT_SUMMARY.md)。
