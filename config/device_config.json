@@ -27,7 +27,7 @@
     "ear": 0.21
   },
   "storage": {
-    "databasePath": "data/smartsite.db",
+    "databasePath": "data/smartsite.sqlite",
     "captureDir": "data/captures",
     "logDir": "data/logs"
   },

@@ -2,6 +2,7 @@
 #include "business/AttendanceManager.h" // 引入考勤管理器。
 #include "camera/CameraWorker.h" // 引入摄像头工作对象。
 #include "comm/CloudClient.h" // 引入云端客户端。
+#include "domain/RecognizedFaceRecord.h" // 引入识别人脸落库记录。
 #include "hardware/AccessController.h" // 引入硬件控制器。
 #include "monitor/SystemMonitor.h" // 引入系统监控器。
 #include "vision/FaceRecognizer.h" // 引入识别器。
@@ -18,7 +19,7 @@ public: // 声明公共接口。
     ~MainWindow() override; // 析构主窗口。
 private slots: // 声明界面槽函数。
     void onFrameCaptured(const FramePacket& packet); // 处理摄像头帧。
-    void onRecognitionReady(const RecognitionResult& result); // 处理识别结果。
+    void onRecognitionReady(const RecognitionResult& result, qint64 frameId, const QString& snapshotPath); // 处理识别结果。
     void onStatusMessage(const QString& message); // 处理状态消息。
     void onLogMessage(const QString& level, const QString& message); // 处理日志消息。
     void onRecordCreated(const AttendanceRecord& record); // 处理考勤记录生成。
@@ -33,7 +34,9 @@ private: // 声明私有工具函数。
     void refreshRecords(); // 刷新考勤记录。
     void appendLogRow(const QString& level, const QString& message); // 追加日志到界面。
     void updateMetrics(); // 刷新统计信息。
-    void handleRecognition(const RecognitionResult& result); // 处理识别逻辑。
+    QString saveRecognitionSnapshot(const FramePacket& packet) const; // 保存本次识别抓拍图片。
+    RecognizedFaceRecord buildRecognizedFaceRecord(const RecognitionResult& result, qint64 frameId, const QString& snapshotPath, bool accessAllowed, const QString& decision) const; // 构建识别落库记录。
+    void handleRecognition(const RecognitionResult& result, qint64 frameId, const QString& snapshotPath); // 处理识别逻辑。
     QLabel* videoLabel_ = nullptr; // 保存视频显示控件。
     QLabel* statusLabel_ = nullptr; // 保存状态显示控件。
     QLabel* gateLabel_ = nullptr; // 保存闸机状态控件。
@@ -54,4 +57,5 @@ private: // 声明私有工具函数。
     int frameCounter_ = 0; // 保存帧计数。
     int recognitionInterval_ = 8; // 保存识别间隔帧数。
     QString deviceId_ = QStringLiteral("SITE-GATE-001"); // 保存设备编号。
+    QString captureDir_; // 保存本地抓拍目录。
 }; // 结束主窗口定义。

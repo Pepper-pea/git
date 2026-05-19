@@ -14,6 +14,7 @@
 ## src/domain
 - `Person.h`：人员资料结构和 JSON 序列化。
 - `AttendanceRecord.h`：考勤记录结构和 JSON 序列化。
+- `RecognizedFaceRecord.h`：每一次识别人脸的本地 SQLite 落库结构。
 
 ## src/camera
 - `FramePacket.h`：视频帧数据结构。
@@ -29,7 +30,7 @@
 - `FaceRecognizer.h/cpp`：人脸检测、识别、人员录入。
 
 ## src/storage
-- `DatabaseManager.h/cpp`：SQLite 数据库连接、人员库、考勤记录、日志管理。
+- `DatabaseManager.h/cpp`：SQLite 数据库连接、人员库、识别人脸记录、考勤记录、日志管理。
 
 ## src/business
 - `AttendanceManager.h/cpp`：考勤规则、重复打卡控制、记录生成、通行判定。
@@ -52,3 +53,5 @@
 ## 运行特点
 - 有 OpenCV、dlib、Qt MQTT 时使用增强路径。
 - 缺少依赖时会自动降级到演示逻辑，保证主流程仍可打开。
+- 本地数据库固定创建在项目目录 `data/smartsite.sqlite`，可用 Navicat Premium 17 以 SQLite 文件方式打开。
+- `recognized_faces` 表保存每次识别结果和抓拍图片路径，抓拍文件保存在 `data/captures`。

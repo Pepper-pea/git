@@ -1,6 +1,7 @@
 #pragma once // 防止头文件被重复包含。
 #include "domain/AttendanceRecord.h" // 引入考勤记录结构。
 #include "domain/Person.h" // 引入人员结构。
+#include "domain/RecognizedFaceRecord.h" // 引入识别人脸记录结构。
 #include <QDateTime> // 引入 Qt 日期时间类型。
 #include <QByteArray> // 引入二进制数组类型。
 #include <QJsonArray> // 引入 JSON 数组类型。
@@ -19,6 +20,8 @@ public: // 声明公共接口。
     QVector<Person> loadPersons(const QString& listType = QString()) const; // 查询人员列表。
     bool saveAttendanceRecord(const AttendanceRecord& record); // 保存考勤记录。
     QVector<AttendanceRecord> loadAttendanceRecords(int limit = 200) const; // 查询考勤记录。
+    bool saveRecognizedFace(const RecognizedFaceRecord& record); // 保存每一次人脸识别记录。
+    QVector<RecognizedFaceRecord> loadRecognizedFaces(int limit = 200) const; // 查询最近识别记录。
     QVector<Person> loadWhitelist() const; // 查询白名单人员。
     QVector<Person> loadBlacklist() const; // 查询黑名单人员。
     bool markUploaded(const QString& recordId, bool uploaded); // 更新记录上传状态。

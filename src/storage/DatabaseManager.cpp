@@ -5,6 +5,7 @@
 #include <QMutexLocker> // 引入互斥锁封装。
 #include <QSqlError> // 引入 SQL 错误类型。
 #include <QSqlQuery> // 引入 SQL 查询类。
+#include <QUuid> // 引入唯一编号生成。
 #include <QVariant> // 引入 QVariant。
 #include <cstring> // 引入内存拷贝函数。
 DatabaseManager& DatabaseManager::instance() { // 实现单例获取函数。
@@ -36,6 +37,9 @@ bool DatabaseManager::initialize() { // 实现数据库表初始化函数。
     const char* schema[] = { // 定义建表 SQL 语句集合。
         "CREATE TABLE IF NOT EXISTS persons (id TEXT PRIMARY KEY, name TEXT, team TEXT, role TEXT, card_no TEXT, list_type TEXT, access_level INTEGER, enabled INTEGER, feature BLOB)", // 创建人员表。
         "CREATE TABLE IF NOT EXISTS attendance_records (id TEXT PRIMARY KEY, person_id TEXT, person_name TEXT, team TEXT, direction TEXT, result TEXT, score REAL, device_id TEXT, snapshot_path TEXT, uploaded INTEGER, created_at TEXT)", // 创建考勤表。
+        "CREATE TABLE IF NOT EXISTS recognized_faces (id TEXT PRIMARY KEY, frame_id INTEGER, person_id TEXT, person_name TEXT, team TEXT, status TEXT, access_allowed INTEGER, decision TEXT, message TEXT, score REAL, cosine REAL, euclidean REAL, quality REAL, blink_detected INTEGER, face_x INTEGER, face_y INTEGER, face_width INTEGER, face_height INTEGER, snapshot_path TEXT, device_id TEXT, created_at TEXT)", // 创建识别人脸记录表。
+        "CREATE INDEX IF NOT EXISTS idx_recognized_faces_created_at ON recognized_faces(created_at)", // 创建识别时间索引。
+        "CREATE INDEX IF NOT EXISTS idx_recognized_faces_person_id ON recognized_faces(person_id)", // 创建识别人员索引。
         "CREATE TABLE IF NOT EXISTS device_logs (id INTEGER PRIMARY KEY AUTOINCREMENT, level TEXT, message TEXT, created_at TEXT)" // 创建设备日志表。
     }; // 结束 SQL 数组定义。
     for(const char* statement : schema) { // 遍历每一条建表语句。
@@ -164,6 +168,78 @@ QVector<AttendanceRecord> DatabaseManager::loadAttendanceRecords(int limit) cons
     } // 结束结果遍历。
     return records; // 返回考勤记录数组。
 } // 结束考勤记录查询函数。
+bool DatabaseManager::saveRecognizedFace(const RecognizedFaceRecord& record) { // 实现识别人脸记录保存函数。
+    QMutexLocker locker(&mutex_); // 上锁保护数据库写入。
+    if(!database_.isOpen() && !database_.open()) { // 判断数据库是否可用。
+        lastError_ = database_.lastError().text(); // 记录错误信息。
+        return false; // 返回失败。
+    } // 结束数据库判断。
+    QSqlQuery query(database_); // 创建 SQL 查询对象。
+    query.prepare(QStringLiteral("INSERT INTO recognized_faces(id, frame_id, person_id, person_name, team, status, access_allowed, decision, message, score, cosine, euclidean, quality, blink_detected, face_x, face_y, face_width, face_height, snapshot_path, device_id, created_at) VALUES(:id, :frame_id, :person_id, :person_name, :team, :status, :access_allowed, :decision, :message, :score, :cosine, :euclidean, :quality, :blink_detected, :face_x, :face_y, :face_width, :face_height, :snapshot_path, :device_id, :created_at) ON CONFLICT(id) DO UPDATE SET frame_id=excluded.frame_id, person_id=excluded.person_id, person_name=excluded.person_name, team=excluded.team, status=excluded.status, access_allowed=excluded.access_allowed, decision=excluded.decision, message=excluded.message, score=excluded.score, cosine=excluded.cosine, euclidean=excluded.euclidean, quality=excluded.quality, blink_detected=excluded.blink_detected, face_x=excluded.face_x, face_y=excluded.face_y, face_width=excluded.face_width, face_height=excluded.face_height, snapshot_path=excluded.snapshot_path, device_id=excluded.device_id, created_at=excluded.created_at")); // 准备识别记录插入或更新语句。
+    const QString id = record.id.isEmpty() ? QStringLiteral("FACE-%1-%2").arg(QDateTime::currentDateTime().toString(QStringLiteral("yyyyMMddhhmmsszzz")), QUuid::createUuid().toString(QUuid::Id128).left(8)) : record.id; // 生成兜底编号。
+    query.bindValue(QStringLiteral(":id"), id); // 绑定识别记录编号。
+    query.bindValue(QStringLiteral(":frame_id"), record.frameId); // 绑定帧序号。
+    query.bindValue(QStringLiteral(":person_id"), record.personId); // 绑定人员编号。
+    query.bindValue(QStringLiteral(":person_name"), record.personName); // 绑定人员姓名。
+    query.bindValue(QStringLiteral(":team"), record.team); // 绑定班组。
+    query.bindValue(QStringLiteral(":status"), record.status); // 绑定识别状态。
+    query.bindValue(QStringLiteral(":access_allowed"), record.accessAllowed ? 1 : 0); // 绑定通行结果。
+    query.bindValue(QStringLiteral(":decision"), record.decision); // 绑定通行判定。
+    query.bindValue(QStringLiteral(":message"), record.message); // 绑定识别说明。
+    query.bindValue(QStringLiteral(":score"), record.score); // 绑定综合得分。
+    query.bindValue(QStringLiteral(":cosine"), record.cosine); // 绑定余弦相似度。
+    query.bindValue(QStringLiteral(":euclidean"), record.euclidean); // 绑定欧氏距离。
+    query.bindValue(QStringLiteral(":quality"), record.quality); // 绑定图像质量。
+    query.bindValue(QStringLiteral(":blink_detected"), record.blinkDetected ? 1 : 0); // 绑定活体结果。
+    query.bindValue(QStringLiteral(":face_x"), record.faceRect.x()); // 绑定人脸横坐标。
+    query.bindValue(QStringLiteral(":face_y"), record.faceRect.y()); // 绑定人脸纵坐标。
+    query.bindValue(QStringLiteral(":face_width"), record.faceRect.width()); // 绑定人脸宽度。
+    query.bindValue(QStringLiteral(":face_height"), record.faceRect.height()); // 绑定人脸高度。
+    query.bindValue(QStringLiteral(":snapshot_path"), record.snapshotPath); // 绑定抓拍图片路径。
+    query.bindValue(QStringLiteral(":device_id"), record.deviceId); // 绑定设备编号。
+    query.bindValue(QStringLiteral(":created_at"), record.createdAt.isValid() ? record.createdAt.toString(Qt::ISODate) : QDateTime::currentDateTime().toString(Qt::ISODate)); // 绑定创建时间。
+    if(!query.exec()) { // 执行写入语句。
+        lastError_ = query.lastError().text(); // 记录错误信息。
+        return false; // 返回失败。
+    } // 结束 SQL 执行判断。
+    return true; // 返回成功。
+} // 结束识别人脸记录保存函数。
+QVector<RecognizedFaceRecord> DatabaseManager::loadRecognizedFaces(int limit) const { // 实现识别人脸记录查询函数。
+    QMutexLocker locker(&mutex_); // 上锁保护数据库读取。
+    QVector<RecognizedFaceRecord> records; // 创建识别记录数组。
+    if(!database_.isOpen()) { // 判断数据库是否已打开。
+        return records; // 返回空数组。
+    } // 结束数据库判断。
+    QSqlQuery query(database_); // 创建 SQL 查询对象。
+    query.prepare(QStringLiteral("SELECT id, frame_id, person_id, person_name, team, status, access_allowed, decision, message, score, cosine, euclidean, quality, blink_detected, face_x, face_y, face_width, face_height, snapshot_path, device_id, created_at FROM recognized_faces ORDER BY created_at DESC LIMIT :limit")); // 准备查询语句。
+    query.bindValue(QStringLiteral(":limit"), limit); // 绑定查询数量。
+    if(!query.exec()) { // 执行查询。
+        return records; // 返回空数组。
+    } // 结束 SQL 执行判断。
+    while(query.next()) { // 遍历查询结果。
+        RecognizedFaceRecord record; // 创建识别记录对象。
+        record.id = query.value(0).toString(); // 读取记录编号。
+        record.frameId = query.value(1).toLongLong(); // 读取帧序号。
+        record.personId = query.value(2).toString(); // 读取人员编号。
+        record.personName = query.value(3).toString(); // 读取人员姓名。
+        record.team = query.value(4).toString(); // 读取班组。
+        record.status = query.value(5).toString(); // 读取识别状态。
+        record.accessAllowed = query.value(6).toInt() != 0; // 读取通行结果。
+        record.decision = query.value(7).toString(); // 读取通行判定。
+        record.message = query.value(8).toString(); // 读取识别说明。
+        record.score = query.value(9).toDouble(); // 读取综合得分。
+        record.cosine = query.value(10).toDouble(); // 读取余弦相似度。
+        record.euclidean = query.value(11).toDouble(); // 读取欧氏距离。
+        record.quality = query.value(12).toDouble(); // 读取图像质量。
+        record.blinkDetected = query.value(13).toInt() != 0; // 读取活体结果。
+        record.faceRect = QRect(query.value(14).toInt(), query.value(15).toInt(), query.value(16).toInt(), query.value(17).toInt()); // 读取人脸矩形。
+        record.snapshotPath = query.value(18).toString(); // 读取抓拍路径。
+        record.deviceId = query.value(19).toString(); // 读取设备编号。
+        record.createdAt = QDateTime::fromString(query.value(20).toString(), Qt::ISODate); // 读取创建时间。
+        records.append(record); // 追加到结果数组。
+    } // 结束结果遍历。
+    return records; // 返回识别记录数组。
+} // 结束识别人脸记录查询函数。
 QVector<Person> DatabaseManager::loadWhitelist() const { // 实现白名单查询函数。
     return loadPersons(QStringLiteral("white")); // 返回白名单人员。
 } // 结束白名单查询函数。

@@ -20,4 +20,17 @@ nmake
 
 如果本机缺少 OpenCV、dlib 或 Qt MQTT，项目会自动使用降级实现：摄像头可用演示画面，MQTT 会退化为 HTTP/本地缓存，核心业务流程仍可运行。
 
+## 本地 SQLite 数据库
+
+程序会在项目目录下创建 `data/smartsite.sqlite`，Navicat Premium 17 可以直接打开这个文件。打开方式：新建连接，选择 SQLite，然后选择现有数据库文件 `D:\MyGitWarehouse\git\data\smartsite.sqlite`。
+
+主要数据表：
+
+- `persons`：人员库和人脸特征。
+- `recognized_faces`：每一次识别人脸的记录，包含姓名、识别状态、通行判定、分数、活体结果、人脸框坐标和抓拍图片路径。
+- `attendance_records`：允许通行后生成的考勤记录。
+- `device_logs`：设备运行日志。
+
+数据库表结构脚本见 [docs/sqlite_schema.sql](docs/sqlite_schema.sql)。
+
 完整目录说明见 [docs/PROJECT_SUMMARY.md](docs/PROJECT_SUMMARY.md)。

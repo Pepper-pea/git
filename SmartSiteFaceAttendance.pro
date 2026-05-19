@@ -55,6 +55,7 @@ HEADERS += \
     src/camera/CameraWorker.h \
     src/domain/Person.h \
     src/domain/AttendanceRecord.h \
+    src/domain/RecognizedFaceRecord.h \
     src/utils/MatImageConverter.h \
     src/vision/FaceTypes.h \
     src/vision/FaceFeatureExtractor.h \
