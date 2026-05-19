@@ -1,0 +1,13 @@
+build/
+*.user
+*.user.*
+*.pro.user
+Makefile
+debug/
+release/
+*.obj
+*.pdb
+*.ilk
+*.exe
+*.dll
+data/

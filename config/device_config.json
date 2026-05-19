@@ -1,0 +1,38 @@
+{
+  "deviceId": "SITE-GATE-001",
+  "siteName": "智慧工地实名制通道",
+  "cameraIndex": 0,
+  "recognitionIntervalFrames": 8,
+  "duplicateSeconds": 60,
+  "mqtt": {
+    "host": "127.0.0.1",
+    "port": 1883,
+    "clientId": "SITE-GATE-001-terminal",
+    "username": "",
+    "password": "",
+    "statusTopic": "site/SITE-GATE-001/status",
+    "recordTopic": "site/SITE-GATE-001/attendance",
+    "commandTopic": "site/SITE-GATE-001/command"
+  },
+  "http": {
+    "recordUrl": "http://127.0.0.1:8080/api/attendance",
+    "statusUrl": "http://127.0.0.1:8080/api/status",
+    "configUrl": "http://127.0.0.1:8080/api/device/config",
+    "otaUrl": "http://127.0.0.1:8080/api/device/ota/latest"
+  },
+  "thresholds": {
+    "cosine": 0.82,
+    "euclidean": 0.75,
+    "quality": 0.35,
+    "ear": 0.21
+  },
+  "storage": {
+    "databasePath": "data/smartsite.db",
+    "captureDir": "data/captures",
+    "logDir": "data/logs"
+  },
+  "models": {
+    "faceCascade": "models/haarcascade_frontalface_default.xml",
+    "shapePredictor68": "models/shape_predictor_68_face_landmarks.dat"
+  }
+}
