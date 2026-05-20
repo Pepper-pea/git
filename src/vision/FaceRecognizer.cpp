@@ -261,6 +261,7 @@ RecognitionResult FaceRecognizer::matchAgainstDatabase(const QImage& face, const
     } // 结束特征判断。
     double bestCosine = -1.0; // 创建最佳余弦值。
     double bestEuclidean = 999.0; // 创建最佳欧氏距离。
+    int comparedCount = 0; // 记录参与匹配的人员模板数量。
     Person bestPerson; // 创建最佳人员对象。
     for(const Person& person : persons) { // 遍历数据库人员。
         if(!person.enabled) { // 判断人员是否启用。
@@ -269,6 +270,7 @@ RecognitionResult FaceRecognizer::matchAgainstDatabase(const QImage& face, const
         if(person.feature.isEmpty()) { // 判断是否有模板特征。
             continue; // 跳过没有模板的人。
         } // 结束模板判断。
+        ++comparedCount; // 记录一个可用模板。
         const double cosine = FaceFeatureExtractor::cosineSimilarity(feature, person.feature); // 计算余弦相似度。
         const double euclidean = FaceFeatureExtractor::euclideanDistance(feature, person.feature); // 计算欧氏距离。
         if(cosine > bestCosine) { // 判断是否比当前最佳更优。
@@ -277,11 +279,20 @@ RecognitionResult FaceRecognizer::matchAgainstDatabase(const QImage& face, const
             bestPerson = person; // 记录对应人员。
         } // 结束比较判断。
     } // 结束遍历人员。
+    if(comparedCount == 0) { // 判断是否没有可用人员模板。
+        best.status = RecognitionStatus::Stranger; // 标记陌生人。
+        best.message = QStringLiteral("人员库为空或没有可用人脸模板"); // 记录提示文本。
+        best.cosine = 0.0; // 保存默认余弦值。
+        best.euclidean = 999.0; // 保存默认欧氏距离。
+        lastError_ = best.message; // 保存失败原因。
+        return best; // 返回结果。
+    } // 结束模板数量判断。
     if(bestCosine < cosineThreshold_ || bestEuclidean > euclideanThreshold_) { // 判断是否达到识别阈值。
         best.status = RecognitionStatus::Stranger; // 标记陌生人。
-        best.message = QStringLiteral("未达到识别阈值"); // 记录提示文本。
+        best.message = QStringLiteral("未达到识别阈值：cosine=%1/%2, euclidean=%3/%4").arg(QString::number(bestCosine, 'f', 3), QString::number(cosineThreshold_, 'f', 3), QString::number(bestEuclidean, 'f', 3), QString::number(euclideanThreshold_, 'f', 3)); // 记录提示文本。
         best.cosine = bestCosine; // 保存最佳余弦值。
         best.euclidean = bestEuclidean; // 保存最佳欧氏距离。
+        lastError_ = best.message; // 保存失败原因。
         return best; // 返回结果。
     } // 结束阈值判断。
     best.status = bestPerson.listType == QStringLiteral("black") ? RecognitionStatus::Denied : RecognitionStatus::Accepted; // 根据名单类型决定状态。

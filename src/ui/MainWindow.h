@@ -47,8 +47,10 @@ private: // 声明私有工具函数。
     RecognizedFaceRecord buildRecognizedFaceRecord(const RecognitionResult& result, qint64 frameId, const QString& snapshotPath, bool accessAllowed, const QString& decision) const; // 构建识别落库记录。
     void handleRecognition(const RecognitionResult& result, qint64 frameId, const QString& snapshotPath); // 处理识别逻辑。
     void processEnrollmentChallenge(const QImage& image, qint64 frameId); // 处理录入活体动作挑战。
+    void processEnrollmentTemplateCapture(const QImage& image, qint64 frameId); // 处理录入正脸模板采集。
     void finishEnrollmentChallenge(bool clearPendingPerson); // 结束录入活体动作挑战。
     void setEnrollmentInputsEnabled(bool enabled); // 设置录入表单是否可编辑。
+    enum class EnrollmentStage { Idle, Challenge, CollectTemplate }; // 定义录入流程阶段。
     QLabel* videoLabel_ = nullptr; // 保存视频显示控件。
     QLabel* statusLabel_ = nullptr; // 保存状态显示控件。
     QLabel* gateLabel_ = nullptr; // 保存闸机状态控件。
@@ -86,10 +88,17 @@ private: // 声明私有工具函数。
     Person pendingEnrollmentPerson_; // 保存等待活体动作通过后录入的人员。
     EnrollmentChallengeType enrollmentChallenge_ = EnrollmentChallengeType::Blink; // 保存当前录入活体动作。
     QDateTime enrollmentChallengeStartedAt_; // 保存录入活体动作开始时间。
+    QDateTime enrollmentTemplateStartedAt_; // 保存正脸模板采集开始时间。
+    QImage enrollmentBestTemplateFrame_; // 保存正脸采集期间质量最高的一帧。
+    qint64 enrollmentBestTemplateFrameId_ = 0; // 保存最佳模板帧号。
+    EnrollmentStage enrollmentStage_ = EnrollmentStage::Idle; // 保存当前录入流程阶段。
     bool enrollmentChallengeActive_ = false; // 保存是否正在进行录入活体动作。
     int enrollmentChallengeTimeoutSeconds_ = 15; // 保存录入活体动作超时时间。
+    int enrollmentTemplateStableFrames_ = 0; // 保存正脸模板连续稳定帧数。
+    double enrollmentBestTemplateQuality_ = -1.0; // 保存正脸采集期间最佳质量分。
     bool enrollmentLastFaceDetected_ = false; // 保存录入挑战最近是否检测到人脸。
     bool enrollmentLastLandmarksReady_ = false; // 保存录入挑战最近是否有 68 点关键点。
     double enrollmentLastHeadTurnOffset_ = 0.0; // 保存录入挑战最近一次转头偏移。
+    double enrollmentLastMouthOpenRatio_ = 0.0; // 保存录入挑战最近一次张嘴比例。
     double enrollmentTurnOffsetThreshold_ = 0.18; // 保存录入挑战转头阈值。
 }; // 结束主窗口定义。

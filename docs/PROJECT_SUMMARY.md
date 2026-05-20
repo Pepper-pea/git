@@ -33,7 +33,7 @@
 ## src/vision
 - `FaceTypes.h`：识别状态、检测结果、识别结果定义。
 - `FaceFeatureExtractor.h/cpp`：人脸特征提取与相似度计算。
-- `LivenessDetector.h/cpp`：录入活体动作检测，支持眨眼、向左转头、向右转头和张嘴；转头方向按使用者本人左右提示。
+- `LivenessDetector.h/cpp`：录入活体动作检测，支持眨眼、向左转头、向右转头和张嘴；也提供无状态姿态测量用于正脸模板采集。
 - `FaceRecognizer.h/cpp`：加载 OpenCV Haar 人脸检测模型、dlib 68 点关键点模型，完成人脸检测、识别和人员特征保存。
 
 ## src/storage
@@ -65,7 +65,7 @@
 - 摄像头或通信依赖缺失时仍会降级，保证界面、数据库等主流程可打开。
 - 人脸检测和 68 点关键点流程要求 `models/haarcascade_frontalface_default.xml` 与 `models/shape_predictor_68_face_landmarks.dat` 存在并成功加载。
 - 普通门禁识别默认不强制眨眼，匹配人员库通过后按名单和重复打卡规则开门。
-- 右侧“人员录入”区域使用随机活体动作，动作通过后自动保存到 `persons` 表；dlib 68 点模型不可用时禁止录入。
+- 右侧“人员录入”区域使用随机活体动作，动作通过后要求用户回正脸并采集稳定模板，再保存到 `persons` 表；dlib 68 点模型不可用时禁止录入。
 - dlib 68 点模型来自官方 `davisking/dlib-models` 仓库，其训练数据带有非商业用途限制；正式商业使用前请替换为许可匹配的模型或重新训练模型。
 - 本地数据库固定创建在项目目录 `data/smartsite.sqlite`，可用 Navicat Premium 17 以 SQLite 文件方式打开。
 - `recognized_faces` 表保存每次识别结果和抓拍图片路径，抓拍文件保存在 `data/captures`。

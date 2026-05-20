@@ -57,6 +57,14 @@ bool LivenessDetector::updateChallenge(FaceDetection& detection, EnrollmentChall
     stableFrames_ = passedCurrentFrame ? stableFrames_ + 1 : 0; // 更新连续通过帧数。
     return stableFrames_ >= stableFrameCount_; // 达到要求后返回通过。
 } // 结束录入动作挑战判断函数。
+bool LivenessDetector::measurePose(FaceDetection& detection) const { // 实现无状态姿态测量函数。
+    if(detection.landmarks.size() < 68) { // 判断是否缺少 dlib 68 点关键点。
+        return false; // 关键点不足时无法测量姿态。
+    } // 结束关键点检查。
+    detection.mouthOpenRatio = calculateMouthOpenRatio(detection.landmarks); // 计算嘴部张开比例。
+    detection.headTurnOffset = calculateHeadTurnOffset(detection.landmarks); // 计算头部左右偏移。
+    return true; // 返回测量成功。
+} // 结束无状态姿态测量函数。
 double LivenessDetector::calculateEar(const QVector<QPointF>& landmarks) const { // 实现 EAR 计算函数。
     if(landmarks.size() < 68) { // 判断关键点数量是否不足。
         return 0.0; // 返回零表示无法计算。

@@ -10,6 +10,7 @@ public: // 声明公共接口。
     void reset(); // 重置活体检测状态。
     bool update(FaceDetection& detection); // 输入检测结果并更新活体判断。
     bool updateChallenge(FaceDetection& detection, EnrollmentChallengeType challenge); // 输入检测结果并判断录入动作是否通过。
+    bool measurePose(FaceDetection& detection) const; // 只计算头部和嘴部姿态，不改变活体检测状态。
     double calculateEar(const QVector<QPointF>& landmarks) const; // 根据 68 点关键点计算 EAR。
     double calculateMouthOpenRatio(const QVector<QPointF>& landmarks) const; // 根据 68 点关键点计算张嘴比例。
     double calculateHeadTurnOffset(const QVector<QPointF>& landmarks) const; // 根据 68 点关键点计算转头偏移。

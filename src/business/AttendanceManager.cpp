@@ -55,7 +55,7 @@ QString AttendanceManager::explainDecision(const RecognitionResult& result) cons
         return QStringLiteral("图像质量不足"); // 返回说明文本。
     } // 结束质量判断。
     if(result.status == RecognitionStatus::Stranger) { // 判断是否陌生人。
-        return QStringLiteral("未匹配到库内人员"); // 返回说明文本。
+        return result.message.isEmpty() ? QStringLiteral("未匹配到库内人员") : result.message; // 优先返回识别器给出的具体原因。
     } // 结束陌生人判断。
     if(result.person.listType == QStringLiteral("black")) { // 判断是否黑名单。
         return QStringLiteral("黑名单禁止通行"); // 返回说明文本。
