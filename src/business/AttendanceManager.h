@@ -32,6 +32,6 @@ private: // 声明私有工具。
     int duplicateSeconds_ = 60; // 保存重复打卡时间窗口。
     double cosineThreshold_ = 0.82; // 保存余弦阈值。
     double euclideanThreshold_ = 0.75; // 保存欧氏距离阈值。
-    bool requireLiveness_ = true; // 保存是否强制活体检测。
+    bool requireLiveness_ = false; // 保存是否强制活体检测。
     mutable QHash<QString, QDateTime> lastAttendance_; // 保存最近考勤时间。
 }; // 结束考勤管理器定义。

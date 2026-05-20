@@ -13,11 +13,19 @@ enum class RecognitionStatus { // 定义识别状态枚举。
     Spoof, // 表示活体检测未通过。
     LowQuality // 表示图像质量不足。
 }; // 结束识别状态枚举。
+enum class EnrollmentChallengeType { // 定义录入活体动作类型。
+    Blink, // 眨眼。
+    TurnLeft, // 向画面左侧转头。
+    TurnRight, // 向画面右侧转头。
+    OpenMouth // 张嘴。
+}; // 结束录入活体动作类型。
 struct FaceDetection { // 定义人脸检测结果。
     QRect rect; // 保存人脸矩形区域。
     QVector<QPointF> landmarks; // 保存人脸关键点。
     double quality = 0.0; // 保存图像质量得分。
     double eyeAspectRatio = 0.0; // 保存眼睛纵横比。
+    double mouthOpenRatio = 0.0; // 保存嘴部张开比例。
+    double headTurnOffset = 0.0; // 保存鼻尖相对双眼中心的横向偏移比例。
     bool blinkDetected = false; // 保存是否检测到眨眼。
 }; // 结束人脸检测结果结构。
 struct RecognitionResult { // 定义完整识别结果。

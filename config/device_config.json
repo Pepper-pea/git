@@ -26,6 +26,13 @@
     "quality": 0.35,
     "ear": 0.21
   },
+  "liveness": {
+    "requireForRecognition": false,
+    "enrollmentChallengeTimeoutSeconds": 10,
+    "mouthOpenRatio": 0.45,
+    "turnOffsetRatio": 0.30,
+    "stableFrames": 3
+  },
   "storage": {
     "databasePath": "data/smartsite.sqlite",
     "captureDir": "data/captures",
