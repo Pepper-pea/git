@@ -16,7 +16,7 @@ qmake SmartSiteFaceAttendance.pro
 nmake
 ```
 
-项目已打包 OpenCV 4.8.0 MSVC x64 Release 运行库，使用 Qt Creator 的 Release 构建时会自动启用 OpenCV。Debug 构建不会混用这个 Release 版 OpenCV；如果 Debug 也要启用 OpenCV，需要本地额外配置 Debug 版 OpenCV 或使用 Git LFS 托管较大的 Debug DLL。dlib 仍需在 qmake 时传入 `DLIB_INCLUDEPATH`、`DLIB_LIBS`。
+项目已打包 OpenCV 4.8.0 MSVC x64 Release 运行库，使用 Qt Creator 的 Release 构建时会自动启用 OpenCV。Debug 构建不会混用这个 Release 版 OpenCV；如果 Debug 也要启用 OpenCV，需要本地额外配置 Debug 版 OpenCV 或使用 Git LFS 托管较大的 Debug DLL。dlib 20.0.1 源码已放在项目内，qmake/CMake 会自动编译并启用 68 点关键点接口。
 
 如果本机缺少 OpenCV、dlib 或 Qt MQTT，项目会自动使用降级实现。摄像头会优先使用 OpenCV；未启用 OpenCV 时，会自动尝试 Qt Multimedia 调用电脑摄像头；两者都不可用时才会显示演示画面。MQTT 会退化为 HTTP/本地缓存，核心业务流程仍可运行。
 
@@ -49,18 +49,25 @@ OpenCV 已放在项目内：
 
 请在 Qt Creator 中切到 `Release` 后清理项目、重新运行 qmake、重新构建。构建完成后，`opencv_world480.dll` 会自动复制到可执行程序目录。
 
+## 项目内 dlib
+
+dlib 已放在项目内：
+
+- `third_party/dlib/dlib`
+- `third_party/dlib/dlib/all/source.cpp`
+- `third_party/dlib/LICENSE.txt`
+
+qmake/CMake 会自动加入 dlib 头文件、编译 `dlib/all/source.cpp`，并定义 `SMARTSITE_HAS_DLIB`。Windows 下会同时链接 dlib 需要的 `ws2_32` 和 `winmm` 系统库。
+
 ## 真实模型文件
 
-当前识别流程要求真实使用 OpenCV Haar 和 dlib 68 点模型。Haar 模型已随项目放到 `models/haarcascade_frontalface_default.xml`。dlib 模型仍需放到 `D:\MyGitWarehouse\git\models`：
+当前识别流程要求真实使用 OpenCV Haar 和 dlib 68 点模型。两个模型均已随项目放到 `models`：
 
+- `haarcascade_frontalface_default.xml`
 - `shape_predictor_68_face_landmarks.dat`
 
-可以运行脚本下载缺失模型：
-
-```powershell
-powershell -ExecutionPolicy Bypass -File scripts\download_models.ps1
-```
-
 程序启动时会按 `config/device_config.json` 中的 `models.faceCascade` 和 `models.shapePredictor68` 加载模型。缺少 Haar 模型时无法检测人脸；缺少 dlib 68 点模型时无法完成 68 点关键点和活体流程。
+
+注意：项目内的 dlib 68 点模型来自官方 `davisking/dlib-models` 仓库。该模型对应训练数据带有非商业用途限制；如果项目要用于正式商业场景，请替换为许可匹配的模型或重新训练模型。
 
 完整目录说明见 [docs/PROJECT_SUMMARY.md](docs/PROJECT_SUMMARY.md)。

@@ -13,6 +13,7 @@
 
 ## third_party
 - `opencv`：项目内打包的 OpenCV 4.8.0 MSVC x64 Release 头文件、导入库和运行库。
+- `dlib`：项目内打包的 dlib 20.0.1 源码和许可证，qmake/CMake 会自动编译。
 
 ## scripts
 - `download_models.ps1`：下载 OpenCV Haar 与 dlib 68 点模型到 `models` 目录。
@@ -59,9 +60,11 @@
 ## 运行特点
 - 有 OpenCV、dlib、Qt MQTT 时使用增强路径。
 - OpenCV Release 已打包在 `third_party/opencv`，Qt Creator 使用 Release 构建时自动启用。
+- dlib 源码已打包在 `third_party/dlib`，构建时自动启用 `SMARTSITE_HAS_DLIB`。
 - 未配置 OpenCV 时，若 Qt 安装包含 Multimedia 模块，也可以直接调用电脑自带摄像头。
 - 摄像头或通信依赖缺失时仍会降级，保证界面、数据库等主流程可打开。
 - 人脸检测和 68 点关键点流程要求 `models/haarcascade_frontalface_default.xml` 与 `models/shape_predictor_68_face_landmarks.dat` 存在并成功加载。
+- dlib 68 点模型来自官方 `davisking/dlib-models` 仓库，其训练数据带有非商业用途限制；正式商业使用前请替换为许可匹配的模型或重新训练模型。
 - 本地数据库固定创建在项目目录 `data/smartsite.sqlite`，可用 Navicat Premium 17 以 SQLite 文件方式打开。
 - 右侧“人员录入”区域可把当前摄像头画面录入到 `persons` 表，后续识别会直接匹配新人员。
 - `recognized_faces` 表保存每次识别结果和抓拍图片路径，抓拍文件保存在 `data/captures`。

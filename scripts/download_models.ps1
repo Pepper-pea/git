@@ -7,7 +7,7 @@ $ErrorActionPreference = "Stop"
 New-Item -ItemType Directory -Force -Path $ModelsDir | Out-Null
 
 $haarUrl = "https://raw.githubusercontent.com/opencv/opencv/4.x/data/haarcascades/haarcascade_frontalface_default.xml"
-$dlibUrl = "http://dlib.net/files/shape_predictor_68_face_landmarks.dat.bz2"
+$dlibUrl = "https://github.com/davisking/dlib-models/raw/master/shape_predictor_68_face_landmarks.dat.bz2"
 
 $haarPath = Join-Path $ModelsDir "haarcascade_frontalface_default.xml"
 $dlibArchivePath = Join-Path $ModelsDir "shape_predictor_68_face_landmarks.dat.bz2"

@@ -24,6 +24,8 @@ public: // 声明公共接口。
     void setUseDlib(bool enabled); // 设置是否启用 dlib。
     void setModelPaths(const QString& faceCascadePath, const QString& shapePredictorPath); // 设置模型文件路径。
     bool loadModels(); // 加载 OpenCV Haar 和 dlib 68 点模型。
+    bool livenessAvailable() const; // 判断 dlib 68 点活体是否可用。
+    QString lastError() const; // 读取最近一次失败原因。
     QVector<FaceDetection> detectFaces(const QImage& image) const; // 检测图像中的人脸。
     RecognitionResult recognize(const QImage& image); // 识别单张图像中的人脸。
     bool enrollPerson(Person person, const QImage& image); // 从当前图像录入人员特征。
@@ -43,6 +45,7 @@ private: // 声明私有工具。
     LivenessDetector liveness_; // 保存活体检测器。
     QString faceCascadePath_; // 保存 OpenCV Haar 模型路径。
     QString shapePredictorPath_; // 保存 dlib 68 点模型路径。
+    QString lastError_; // 保存最近一次失败原因。
     double cosineThreshold_ = 0.82; // 保存余弦阈值。
     double euclideanThreshold_ = 0.75; // 保存欧氏阈值。
     double qualityThreshold_ = 0.35; // 保存质量阈值。

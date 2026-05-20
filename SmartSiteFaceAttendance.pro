@@ -49,7 +49,17 @@ CONFIG(release, debug|release) {
     LIBS += $$OPENCV_LIBS
 }
 
-# 可选 dlib：qmake 时传入 DLIB_INCLUDEPATH 和 DLIB_LIBS 即可启用。
+# 项目内 dlib 源码包：直接编译 dlib/all/source.cpp，启用 68 点关键点接口。
+DLIB_BUNDLED_ROOT = $$PWD/third_party/dlib
+DLIB_BUNDLED_SOURCE = $$DLIB_BUNDLED_ROOT/dlib/all/source.cpp
+exists($$DLIB_BUNDLED_ROOT/dlib/image_processing.h):exists($$DLIB_BUNDLED_SOURCE) {
+    DEFINES += SMARTSITE_HAS_DLIB DLIB_NO_GUI_SUPPORT
+    INCLUDEPATH += $$DLIB_BUNDLED_ROOT
+    SOURCES += $$DLIB_BUNDLED_SOURCE
+    win32:LIBS += ws2_32.lib winmm.lib
+}
+
+# 可选外部 dlib：需要覆盖项目内配置时，可在 qmake 时传入 DLIB_INCLUDEPATH 和 DLIB_LIBS。
 !isEmpty(DLIB_INCLUDEPATH) {
     DEFINES += SMARTSITE_HAS_DLIB
     INCLUDEPATH += $$DLIB_INCLUDEPATH
