@@ -24,7 +24,23 @@ TARGET = SmartSiteFaceAttendance
 # 项目头文件搜索路径。
 INCLUDEPATH += $$PWD/src
 
-# 可选 OpenCV：qmake 时传入 OPENCV_INCLUDEPATH 和 OPENCV_LIBS 即可启用。
+# 项目内 OpenCV Release 包：Release 构建时自动启用，Debug 不混用 Release DLL。
+OPENCV_BUNDLED_INCLUDEPATH = $$PWD/third_party/opencv/include
+OPENCV_BUNDLED_LIB = $$PWD/third_party/opencv/x64/vc16/lib/opencv_world480.lib
+OPENCV_BUNDLED_DLL = $$PWD/third_party/opencv/x64/vc16/bin/opencv_world480.dll
+OPENCV_BUNDLED_RUNTIME_DIR = $$OUT_PWD/release
+CONFIG(release, debug|release) {
+    exists($$OPENCV_BUNDLED_INCLUDEPATH/opencv2/opencv.hpp):exists($$OPENCV_BUNDLED_LIB) {
+        DEFINES += SMARTSITE_HAS_OPENCV
+        INCLUDEPATH += $$OPENCV_BUNDLED_INCLUDEPATH
+        LIBS += $$shell_path($$OPENCV_BUNDLED_LIB)
+        win32:exists($$OPENCV_BUNDLED_DLL) {
+            QMAKE_POST_LINK += $$quote(cmd /c copy /Y $$shell_path($$OPENCV_BUNDLED_DLL) $$shell_path($$OPENCV_BUNDLED_RUNTIME_DIR))
+        }
+    }
+}
+
+# 可选外部 OpenCV：需要覆盖项目内配置时，可在 qmake 时传入 OPENCV_INCLUDEPATH 和 OPENCV_LIBS。
 !isEmpty(OPENCV_INCLUDEPATH) {
     DEFINES += SMARTSITE_HAS_OPENCV
     INCLUDEPATH += $$OPENCV_INCLUDEPATH

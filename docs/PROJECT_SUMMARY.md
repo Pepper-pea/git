@@ -11,6 +11,9 @@
 ## models
 - `README.md`：OpenCV Haar 和 dlib 68 点模型文件说明。
 
+## third_party
+- `opencv`：项目内打包的 OpenCV 4.8.0 MSVC x64 Release 头文件、导入库和运行库。
+
 ## scripts
 - `download_models.ps1`：下载 OpenCV Haar 与 dlib 68 点模型到 `models` 目录。
 
@@ -55,6 +58,7 @@
 
 ## 运行特点
 - 有 OpenCV、dlib、Qt MQTT 时使用增强路径。
+- OpenCV Release 已打包在 `third_party/opencv`，Qt Creator 使用 Release 构建时自动启用。
 - 未配置 OpenCV 时，若 Qt 安装包含 Multimedia 模块，也可以直接调用电脑自带摄像头。
 - 摄像头或通信依赖缺失时仍会降级，保证界面、数据库等主流程可打开。
 - 人脸检测和 68 点关键点流程要求 `models/haarcascade_frontalface_default.xml` 与 `models/shape_predictor_68_face_landmarks.dat` 存在并成功加载。

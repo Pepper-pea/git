@@ -1,9 +1,9 @@
 # 模型文件目录
 
-需要把以下模型放到本目录：
+本目录保存识别模型：
 
-- `shape_predictor_68_face_landmarks.dat`：dlib 68 点关键点模型，用于 EAR 眨眼活体检测。
-- `haarcascade_frontalface_default.xml`：OpenCV Haar 人脸检测模型，用于真实人脸框检测。
+- `haarcascade_frontalface_default.xml`：OpenCV Haar 人脸检测模型，已随项目打包。
+- `shape_predictor_68_face_landmarks.dat`：dlib 68 点关键点模型，用于 EAR 眨眼活体检测，需要自行下载或通过脚本下载。
 
 当前识别流程要求真实加载这两个模型。缺少 Haar 模型时无法检测人脸；缺少 dlib 68 点模型时无法录入人员，也无法通过活体关键点流程。
 

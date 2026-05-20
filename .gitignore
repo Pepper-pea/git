@@ -10,4 +10,5 @@ release/
 *.ilk
 *.exe
 *.dll
+!third_party/opencv/x64/vc16/bin/opencv_world480.dll
 data/

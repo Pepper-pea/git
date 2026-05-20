@@ -16,7 +16,7 @@ qmake SmartSiteFaceAttendance.pro
 nmake
 ```
 
-要真实使用 Haar 检测和 dlib 68 点关键点，需要在 qmake 时传入 `OPENCV_INCLUDEPATH`、`OPENCV_LIBS`、`DLIB_INCLUDEPATH`、`DLIB_LIBS`，并把模型文件放到 `models` 目录。
+项目已打包 OpenCV 4.8.0 MSVC x64 Release 运行库，使用 Qt Creator 的 Release 构建时会自动启用 OpenCV。Debug 构建不会混用这个 Release 版 OpenCV；如果 Debug 也要启用 OpenCV，需要本地额外配置 Debug 版 OpenCV 或使用 Git LFS 托管较大的 Debug DLL。dlib 仍需在 qmake 时传入 `DLIB_INCLUDEPATH`、`DLIB_LIBS`。
 
 如果本机缺少 OpenCV、dlib 或 Qt MQTT，项目会自动使用降级实现。摄像头会优先使用 OpenCV；未启用 OpenCV 时，会自动尝试 Qt Multimedia 调用电脑摄像头；两者都不可用时才会显示演示画面。MQTT 会退化为 HTTP/本地缓存，核心业务流程仍可运行。
 
@@ -39,14 +39,23 @@ nmake
 
 如果日志显示“使用演示画面”，请在 Qt 安装维护工具中确认已安装 Qt Multimedia 模块，并检查 Windows 设置里的摄像头权限。如果日志显示“图像质量不足”，请让人脸尽量位于画面中央，并保证光线充足。
 
+## 项目内 OpenCV
+
+OpenCV 已放在项目内：
+
+- `third_party/opencv/include/opencv2`
+- `third_party/opencv/x64/vc16/lib/opencv_world480.lib`
+- `third_party/opencv/x64/vc16/bin/opencv_world480.dll`
+
+请在 Qt Creator 中切到 `Release` 后清理项目、重新运行 qmake、重新构建。构建完成后，`opencv_world480.dll` 会自动复制到可执行程序目录。
+
 ## 真实模型文件
 
-当前识别流程要求真实使用 OpenCV Haar 和 dlib 68 点模型。请把以下两个文件放到 `D:\MyGitWarehouse\git\models`：
+当前识别流程要求真实使用 OpenCV Haar 和 dlib 68 点模型。Haar 模型已随项目放到 `models/haarcascade_frontalface_default.xml`。dlib 模型仍需放到 `D:\MyGitWarehouse\git\models`：
 
-- `haarcascade_frontalface_default.xml`
 - `shape_predictor_68_face_landmarks.dat`
 
-可以运行脚本下载模型：
+可以运行脚本下载缺失模型：
 
 ```powershell
 powershell -ExecutionPolicy Bypass -File scripts\download_models.ps1

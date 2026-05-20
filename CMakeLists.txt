@@ -10,6 +10,10 @@ find_package(Qt6 COMPONENTS Mqtt QUIET) # 可选查找 Qt MQTT 模块。
 find_package(Qt6 COMPONENTS Multimedia QUIET) # 可选查找 Qt Multimedia 摄像头模块。
 find_package(OpenCV QUIET) # 可选查找 OpenCV 图像处理库。
 find_package(dlib CONFIG QUIET) # 可选查找 dlib 人脸检测与关键点库。
+set(BUNDLED_OPENCV_ROOT "${CMAKE_CURRENT_SOURCE_DIR}/third_party/opencv") # 设置项目内 OpenCV 根目录。
+set(BUNDLED_OPENCV_INCLUDE "${BUNDLED_OPENCV_ROOT}/include") # 设置项目内 OpenCV 头文件目录。
+set(BUNDLED_OPENCV_LIB "${BUNDLED_OPENCV_ROOT}/x64/vc16/lib/opencv_world480.lib") # 设置项目内 OpenCV Release 导入库。
+set(BUNDLED_OPENCV_DLL "${BUNDLED_OPENCV_ROOT}/x64/vc16/bin/opencv_world480.dll") # 设置项目内 OpenCV Release 运行库。
 set(SMART_SITE_SOURCES # 声明项目源码列表。
     src/main.cpp # 程序入口源码。
     src/camera/CameraWorker.cpp # 摄像头采集线程源码。
@@ -35,7 +39,21 @@ if(Qt6Multimedia_FOUND) # 判断当前环境是否提供 Qt Multimedia 模块。
     target_compile_definitions(SmartSiteFaceAttendance PRIVATE SMARTSITE_HAS_QTMULTIMEDIA) # 启用 Qt Multimedia 摄像头采集。
     target_link_libraries(SmartSiteFaceAttendance PRIVATE Qt6::Multimedia) # 链接 Qt Multimedia 模块。
 endif() # 结束 Qt Multimedia 判断。
-if(OpenCV_FOUND) # 判断当前环境是否提供 OpenCV。
+if(MSVC AND EXISTS "${BUNDLED_OPENCV_INCLUDE}/opencv2/opencv.hpp" AND EXISTS "${BUNDLED_OPENCV_LIB}") # 优先使用项目内 OpenCV Release 包。
+    target_compile_definitions(SmartSiteFaceAttendance PRIVATE $<$<CONFIG:Release>:SMARTSITE_HAS_OPENCV>) # Release 启用 OpenCV 编译开关。
+    target_include_directories(SmartSiteFaceAttendance PRIVATE "${BUNDLED_OPENCV_INCLUDE}") # 加入项目内 OpenCV 头文件目录。
+    target_link_libraries(SmartSiteFaceAttendance PRIVATE $<$<CONFIG:Release>:${BUNDLED_OPENCV_LIB}>) # Release 链接项目内 OpenCV。
+    if(EXISTS "${BUNDLED_OPENCV_DLL}") # 判断运行库是否存在。
+        add_custom_command(TARGET SmartSiteFaceAttendance POST_BUILD
+            COMMAND ${CMAKE_COMMAND}
+                -D BUILD_CONFIG=$<CONFIG>
+                -D OPENCV_RUNTIME_DLL=${BUNDLED_OPENCV_DLL}
+                -D TARGET_RUNTIME_DIR=$<TARGET_FILE_DIR:SmartSiteFaceAttendance>
+                -P ${CMAKE_CURRENT_SOURCE_DIR}/cmake/copy_opencv_runtime.cmake
+            VERBATIM
+        ) # Release 构建后复制运行库。
+    endif() # 结束运行库判断。
+elseif(OpenCV_FOUND) # 判断当前环境是否提供 OpenCV。
     target_compile_definitions(SmartSiteFaceAttendance PRIVATE SMARTSITE_HAS_OPENCV) # 启用 OpenCV 编译开关。
     target_include_directories(SmartSiteFaceAttendance PRIVATE ${OpenCV_INCLUDE_DIRS}) # 加入 OpenCV 头文件目录。
     target_link_libraries(SmartSiteFaceAttendance PRIVATE ${OpenCV_LIBS}) # 链接 OpenCV 库。
