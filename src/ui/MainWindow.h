@@ -87,5 +87,9 @@ private: // 声明私有工具函数。
     EnrollmentChallengeType enrollmentChallenge_ = EnrollmentChallengeType::Blink; // 保存当前录入活体动作。
     QDateTime enrollmentChallengeStartedAt_; // 保存录入活体动作开始时间。
     bool enrollmentChallengeActive_ = false; // 保存是否正在进行录入活体动作。
-    int enrollmentChallengeTimeoutSeconds_ = 10; // 保存录入活体动作超时时间。
+    int enrollmentChallengeTimeoutSeconds_ = 15; // 保存录入活体动作超时时间。
+    bool enrollmentLastFaceDetected_ = false; // 保存录入挑战最近是否检测到人脸。
+    bool enrollmentLastLandmarksReady_ = false; // 保存录入挑战最近是否有 68 点关键点。
+    double enrollmentLastHeadTurnOffset_ = 0.0; // 保存录入挑战最近一次转头偏移。
+    double enrollmentTurnOffsetThreshold_ = 0.18; // 保存录入挑战转头阈值。
 }; // 结束主窗口定义。

@@ -16,8 +16,8 @@ public: // 声明公共接口。
 private: // 声明私有数据。
     double earThreshold_ = 0.21; // 保存 EAR 闭眼阈值。
     double mouthOpenThreshold_ = 0.45; // 保存张嘴比例阈值。
-    double turnOffsetThreshold_ = 0.30; // 保存转头偏移阈值。
-    int stableFrameCount_ = 3; // 保存连续通过帧数要求。
+    double turnOffsetThreshold_ = 0.18; // 保存转头偏移阈值。
+    int stableFrameCount_ = 2; // 保存连续通过帧数要求。
     int closedFrames_ = 0; // 保存连续闭眼帧数。
     int stableFrames_ = 0; // 保存当前动作连续通过帧数。
     QDateTime lastBlinkAt_; // 保存最近一次眨眼时间。

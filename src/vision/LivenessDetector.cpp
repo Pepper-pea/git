@@ -52,7 +52,7 @@ bool LivenessDetector::updateChallenge(FaceDetection& detection, EnrollmentChall
         passedCurrentFrame = detection.mouthOpenRatio >= mouthOpenThreshold_; // 判断当前帧是否张嘴。
     } else { // 处理转头动作。
         detection.headTurnOffset = calculateHeadTurnOffset(detection.landmarks); // 计算鼻尖偏移。
-        passedCurrentFrame = challenge == EnrollmentChallengeType::TurnLeft ? detection.headTurnOffset <= -turnOffsetThreshold_ : detection.headTurnOffset >= turnOffsetThreshold_; // 判断转头方向。
+        passedCurrentFrame = qAbs(detection.headTurnOffset) >= turnOffsetThreshold_; // 判断是否有足够明显的转头动作，避免镜像画面导致方向反向。
     } // 结束动作判断。
     stableFrames_ = passedCurrentFrame ? stableFrames_ + 1 : 0; // 更新连续通过帧数。
     return stableFrames_ >= stableFrameCount_; // 达到要求后返回通过。

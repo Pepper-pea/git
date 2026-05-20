@@ -28,10 +28,10 @@
   },
   "liveness": {
     "requireForRecognition": false,
-    "enrollmentChallengeTimeoutSeconds": 10,
+    "enrollmentChallengeTimeoutSeconds": 15,
     "mouthOpenRatio": 0.45,
-    "turnOffsetRatio": 0.30,
-    "stableFrames": 3
+    "turnOffsetRatio": 0.18,
+    "stableFrames": 2
   },
   "storage": {
     "databasePath": "data/smartsite.sqlite",

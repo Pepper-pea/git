@@ -15,8 +15,8 @@ enum class RecognitionStatus { // 定义识别状态枚举。
 }; // 结束识别状态枚举。
 enum class EnrollmentChallengeType { // 定义录入活体动作类型。
     Blink, // 眨眼。
-    TurnLeft, // 向画面左侧转头。
-    TurnRight, // 向画面右侧转头。
+    TurnLeft, // 向左转头。
+    TurnRight, // 向右转头。
     OpenMouth // 张嘴。
 }; // 结束录入活体动作类型。
 struct FaceDetection { // 定义人脸检测结果。

@@ -33,7 +33,7 @@
 ## src/vision
 - `FaceTypes.h`：识别状态、检测结果、识别结果定义。
 - `FaceFeatureExtractor.h/cpp`：人脸特征提取与相似度计算。
-- `LivenessDetector.h/cpp`：录入活体动作检测，支持眨眼、向画面左侧转头、向画面右侧转头和张嘴。
+- `LivenessDetector.h/cpp`：录入活体动作检测，支持眨眼、向左转头、向右转头和张嘴；转头方向按使用者本人左右提示。
 - `FaceRecognizer.h/cpp`：加载 OpenCV Haar 人脸检测模型、dlib 68 点关键点模型，完成人脸检测、识别和人员特征保存。
 
 ## src/storage
