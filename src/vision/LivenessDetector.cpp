@@ -69,8 +69,13 @@ double LivenessDetector::calculateEar(const QVector<QPointF>& landmarks) const {
     if(landmarks.size() < 68) { // 判断关键点数量是否不足。
         return 0.0; // 返回零表示无法计算。
     } // 结束关键点数量检查。
-    const double leftEye = (distance(landmarks[37], landmarks[41]) + distance(landmarks[38], landmarks[40])) / (2.0 * distance(landmarks[36], landmarks[39])); // 计算左眼 EAR。
-    const double rightEye = (distance(landmarks[43], landmarks[47]) + distance(landmarks[44], landmarks[46])) / (2.0 * distance(landmarks[42], landmarks[45])); // 计算右眼 EAR。
+    const double leftEyeWidth = distance(landmarks[36], landmarks[39]); // 计算左眼水平宽度。
+    const double rightEyeWidth = distance(landmarks[42], landmarks[45]); // 计算右眼水平宽度。
+    if(leftEyeWidth <= 0.0 || rightEyeWidth <= 0.0) { // 判断分母是否有效。
+        return 0.0; // 关键点重叠时返回零，避免除零警告和异常比例。
+    } // 结束分母检查。
+    const double leftEye = (distance(landmarks[37], landmarks[41]) + distance(landmarks[38], landmarks[40])) / (2.0 * leftEyeWidth); // 计算左眼 EAR。
+    const double rightEye = (distance(landmarks[43], landmarks[47]) + distance(landmarks[44], landmarks[46])) / (2.0 * rightEyeWidth); // 计算右眼 EAR。
     return (leftEye + rightEye) / 2.0; // 返回双眼 EAR 平均值。
 } // 结束 EAR 计算函数。
 double LivenessDetector::calculateMouthOpenRatio(const QVector<QPointF>& landmarks) const { // 实现张嘴比例计算函数。
